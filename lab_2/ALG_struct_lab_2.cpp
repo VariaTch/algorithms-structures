@@ -5,7 +5,7 @@
 #include<cmath>
 using namespace std;
 
-const int RUN = 128;
+const int RUN = 32;
 
 // Эта функция сортирует массив слева направо(сортировка вставками)
 void insertionSort(int arr[], int left, int right)
