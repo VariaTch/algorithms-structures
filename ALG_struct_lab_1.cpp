@@ -154,126 +154,138 @@ struct TipList {
 
 // динамический массив
 
-class dynamic_array
-{
+class DynamicArray {
 private:
+
+	int* array = NULL;
 	int size;
-	int* array;
+	int capacity;
 
 public:
-	dynamic_array()
+	DynamicArray()
 	{
+		capacity = 1;
 		size = 0;
-		array = NULL;
-		cout << "Введите количество элементов, будет создан произвольный массив: " << endl;
-		cin >> size;
-		array = new int[size];
-		for (int i = 0; i < size; i++) {
-			array[i] = rand() % 199 - 99;
+		array = new int[capacity];
+	}
+
+	DynamicArray(int capacity)
+	{
+		this->capacity = capacity;
+		array = new int[capacity];
+		size = 0;
+	}
+
+	int getSize() { return size; }
+
+	int getCapacity() { return capacity; }
+
+	void push_back(int value)
+	{
+		if (size == capacity) {
+
+			growArray();
+		}
+
+		array[size] = value;
+		size++;
+	}
+
+	void pop_back()
+	{
+		array[size - 1] = 0;
+
+		size--;
+		if (size == (capacity / 2)) {
+			shrinkArray();
 		}
 	}
-	~dynamic_array() {
+
+	void growArray()
+	{
+		int* temp = new int[capacity * 2];
+
+		capacity = capacity * 2;
+		for (int i = 0; i < size; i++) {
+			temp[i] = array[i];
+		}
+
 		delete[] array;
-		array = nullptr;
+		array = temp;
 	}
 
-	void show()
+
+	void shrinkArray()
+	{
+
+		capacity = size;
+		int* temp = new int[capacity];
+
+		for (int i = 0; i < size; i++) {
+			temp[i] = array[i];
+		}
+
+		delete[] array;
+		array = temp;
+	}
+
+	int search(int key)
 	{
 		for (int i = 0; i < size; i++) {
-			cout << array[i] << " ";
+			if (array[i] == key) {
+				return i;
+			}
 		}
-		cout << endl;
+		return -1;
 	}
 
-	void insertArray()
+	void insertAt(int index, int value)
 	{
-		show();
-		cout << endl;
-		int Index, Data;
-		int* array2 = new int[size++];
-
-		cout << "Введите индекс для вставки" << endl;
-		cin >> Index;
-		cout << "Введите значение для вставки" << endl;
-		cin >> Data;
-		for (int i = 0; i < size; i++)
-		{
-			if (i < Index)
-			{
-				array2[i] = array[i];
-			}
-
-			if (i >= Index)
-			{
-				array2[i + 1] = array[i];
-
-			}
-			if (i == Index) {
-
-				array2[i] = Data;
-			}
-			if (Index > size) {
-				cout << " Ошибка, индекс слишком большой\n";
-				return;
-			}
-				
+		if (size == capacity) {
+			growArray();
 		}
 
-		for (int i = 0; i < size; i++)
-		{
-			array[i] = array2[i];
+		for (int i = size - 1; i >= index; i--) {
+			array[i + 1] = array[i];
 		}
-		for (int i = 0; i < size; i++)
-		{
-			cout << array[i] << " ";
-		}
-		cout << endl;
+
+		array[index] = value;
+		size++;
 	}
 
-	void deleteArray()
+	void deleteAt(int index)
 	{
-		show();
-		cout << "Введите индекс элемента" << endl;
-		int index;
-		cin >> index;
-		for (int i = index; i < size - 1; i++)
-		{
+		for (int i = index; i < size; i++) {
 			array[i] = array[i + 1];
 		}
+
+		array[size - 1] = 0;
 		size--;
 
-		for (int i = 0; i < size; i++)
-		{
+		if (size == (capacity / 2)) {
+			shrinkArray();
+		}
+	}
+
+	void printArrayDetails()
+	{
+		cout << " Массив : ";
+		for (int i = 0; i < size; i++) {
 			cout << array[i] << " ";
 		}
 		cout << endl;
+		cout << " Кол-во элементов : " << size
+			<< ", capacity :" << capacity << endl;
 	}
-	int GetElemIndex(int Index, int Data)
+
+	bool isEmpty()
 	{
-
-		for (int i = 0; i < size; i++)
-		{
-			if (i == Index)
-			{
-				Data = array[i];
-			}
+		if (size == 0) {
+			return true;
 		}
-
-		return Data;
-	}
-	int GetElemData(int Index, int Data)
-	{
-
-		for (int i = 0; i < size; i++)
-		{
-			if (array[i] == Data)
-			{
-				Index = i;
-			}
-
+		else {
+			return false;
 		}
-
-		return Index;
 	}
 };
 
@@ -699,14 +711,22 @@ int main() {
 			break;
 		case 3:
 			cout << "Поехали" << endl;
-			dynamic_array my_array;
+			DynamicArray da;
+			int size, i;
+			cout << " Введите количество элементов массива: " << endl;
+			cin >> size;
+			for (i = 0; i < size; i++) {
+				da.push_back(rand() % 100);
+			}
+
+			da.printArrayDetails();
 			int e;
 			do {
-				cout << "Выберите действие: " << endl;
+				cout << " Выберите действие: " << endl;
 				cout << "1) Вставка" << endl;
-				cout << "2) Получение значения по индексу " << endl;
-				cout << "3) Получение индекса по значению элемента " << endl;
-				cout << "4) Удаление элемента " << endl;
+				cout << "2) Получение индекса элемента " << endl;
+				cout << "3) Удаление элемента по индексу " << endl;
+				cout << "4) Удаление последнего элемента  " << endl;
 				cout << "5) Выход " << endl;
 
 				cin >> e;
@@ -715,39 +735,44 @@ int main() {
 				{
 				case 1:
 				{
-					my_array.insertArray();
+					int index, value;
+					cout << "Введите индекс , куда необходимо вставить элемент " << endl;
+					cin >> index;
+					cout << "Введите элемент " << endl;
+					cin >> value;
+					da.insertAt(index, value);
+					da.printArrayDetails();
 				}
 				break;
 				case 2:
 				{
-					int Index, Data = 0;
-					my_array.show();
-					cout << "Введите индекс элемента котрый хотите получить " << endl;
-					cin >> Index;
-
-					Data = my_array.GetElemIndex(Index, Data);
-					cout << endl << "Ваш элемент = " << Data << endl;
+					int value;
+					cout << "Введите элемент который хотите получить " << endl;
+					cin >> value;
+					int index = da.search(value);
+					if (index != -1) {
+						cout << "Element found at index : " << index << endl;
+					}
+					else {
+						cout << "Element not found " << endl;
+					}
 				}
 				break;
 				case 3:
 				{
-					int Index = -5, Data = 0;
-					my_array.show();
-					cout << "Введите элемент котрый хотите получить " << endl;
-					cin >> Data;
-					Index = my_array.GetElemData(Index, Data);
-					if (Index != -5) {
-						cout << endl << "Ваш элемент находится под номером " << Index + 1 << endl;
-					}
-					else
-					{
-						cout << "Элемент не найден!" << endl;
-					}
+					int index;
+
+					cout << "Введите индекс элемента, который хотите удалить " << endl;
+					cin >> index;
+					da.deleteAt(index);
+					da.printArrayDetails();
 				}
 				break;
 				case 4:
 				{
-					my_array.deleteArray();
+					cout << "Удаление последнего элемента  " << endl;
+					da.pop_back();
+					da.printArrayDetails();
 				}
 				break;
 				case 5:
@@ -755,12 +780,9 @@ int main() {
 					break;
 				}
 				break;
-				default:cout << "Ошибка! Повторите попытку" << endl;
-					break;
+
 				}
-
 			} while (e != 5);
-
 			break;
 		}
 
