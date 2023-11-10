@@ -216,18 +216,23 @@ void merge( int l, int m, int r)
 void timSort()
 {
 	int n = size;
-	int minRun = 7;
+	int minRun = getMinRun();
 
 	for (int i = 0; i < n; i += minRun)
 		insertionSort(i, std::min((i + minRun - 1), (n - 1)));
 	//режим галопа активируется при обнаружении подмасссива размером >= minRun 
+
+
 	for (int size = minRun; size < n; size = 2 * size) {
 		for (int left = 0; left < n; left += 2 * size) {
-			int mid = left + size - 1;
-			int right = std::min((left + 2 * size - 1), (n - 1));
+			if (minRun >= 7 && (minRun - left >= 7 || size >= 7)) {
+				int mid = left + size - 1;
+				int right = std::min((left + 2 * size - 1), (n - 1));
 
-			if (mid < right)
-				merge(left, mid, right);
+				if (mid < right)
+					merge(left, mid, right);
+			}
+
 		}
 
 	}
@@ -246,7 +251,7 @@ int main()
 		da.push_back(rand() % 100 );
 	}
 
-	da.printArrayDetails();
+	//da.printArrayDetails();
 	int e;
 	do {
 		cout << " Выберите действие: " << endl;
