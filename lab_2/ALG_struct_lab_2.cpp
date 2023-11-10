@@ -186,18 +186,56 @@ void merge( int l, int m, int r)
 	int j = 0;
 	int k = l;
 
+	// проверяем выполнено ли условие 
+	if (len1 > 7 && len2 > 7) {
+		// Сравниваем первый элемент одного прогона с первыми семью элементами другого прогона
+		bool isThresholdMet = false;
+		for (int x = 0; x < 7; x++) {
+			if (left[i] == right[j + x]) {
+				isThresholdMet = true;
+				break;
+			}
+		}
 
-	// сравниваем и объединяем эти два массива в более крупный подмассив
-	while (i < len1 && j < len2) {
-		if (left[i] <= right[j]) {
-			array[k] = left[i];
-			i++;
+		if (isThresholdMet) {
+			//  merge sort
+			while (i < len1 && j < len2) {
+				if (left[i] <= right[j]) {
+					array[k] = left[i];
+					i++;
+				}
+				else {
+					array[k] = right[j];
+					j++;
+				}
+				k++;
+			}
 		}
 		else {
-			array[k] = right[j];
-			j++;
+			// пропускаем слияние и копируем элементы
+			for (int x = 0; x < len1; x++) {
+				array[k] = left[x];
+				k++;
+			}
+			for (int x = 0; x < len2; x++) {
+				array[k] = right[x];
+				k++;
+			}
 		}
-		k++;
+	}
+	else {
+		//  merge sort
+		while (i < len1 && j < len2) {
+			if (left[i] <= right[j]) {
+				array[k] = left[i];
+				i++;
+			}
+			else {
+				array[k] = right[j];
+				j++;
+			}
+			k++;
+		}
 	}
 
 	while (i < len1) {
@@ -220,7 +258,7 @@ void timSort()
 
 	for (int i = 0; i < n; i += minRun)
 		insertionSort(i, std::min((i + minRun - 1), (n - 1)));
-	//режим галопа активируется при обнаружении подмасссива размером >= minRun 
+	
 	for (int size = minRun; size < n; size = 2 * size) {
 		for (int left = 0; left < n; left += 2 * size) {
 			int mid = left + size - 1;
