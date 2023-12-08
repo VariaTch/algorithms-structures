@@ -23,7 +23,6 @@ class AVL:
         self.height = -1
         self.balance = 0
 
-
         if len(args) == 1:
             for i in args[0]:
                 self.insert(i)
@@ -138,39 +137,13 @@ class AVL:
         else:
             self.balance = 0
 
-    # прямой (Preorder) обход дерева
-    def DFS_preOrder(self, node):
-        if self.node is None:
-            return
-        print(self.node.value)
-        self.DFS_preOrder(node.left)
-        self.DFS_preOrder(node.right)
-
-    # центрированный (Inorder) обход дерева
-    def DFS_inOrder(self, node):
-        if self.node is None:
-            return
-
-        self.DFS_inOrder(node.left)
-        print(self.node.value)
-        self.DFS_inOrder(node.right)
-
-    # обратный (postOrder) обход дерева
-    def DFS_postOrder(self, node):
-        if self.node is None:
-            return
-
-        self.DFS_postOrder(node.left)
-        self.DFS_postOrder(node.right)
-        print(self.node.value)
-
     # BFS
     def levelOrder(self, node):
-        if self.node is None:
+        if node is None:
             return
         else:
             customQueue = q
-            customQueue.push(self.node)
+            customQueue.push(node)
             while not (customQueue.isEmpty()):
                 root_1 = customQueue.pop()
                 print(root_1.value.data)
@@ -235,3 +208,54 @@ class AVL:
             self.node.left.display(level + 1, '>')
             if self.node.left is not None:
                 self.node.right.display(level + 1, '>')
+
+    def inorder_traverse(self):
+        if self.node is None:
+            return []
+
+        inlist = []
+        l = self.node.left.inorder_traverse()
+        for i in l:
+            inlist.append(i)
+
+        inlist.append(self.node.value)
+
+        l = self.node.right.inorder_traverse()
+        for i in l:
+            inlist.append(i)
+
+        return inlist
+
+    def preorder_traverse(self):
+        if self.node is None:
+            return []
+
+        inlist = []
+
+        inlist.append(self.node.value)
+        l = self.node.left.preorder_traverse()
+        for i in l:
+            inlist.append(i)
+        l = self.node.right.preorder_traverse()
+        for i in l:
+            inlist.append(i)
+
+        return inlist
+
+    def postorder_traverse(self):
+        if self.node is None:
+            return []
+
+        inlist = []
+
+        l = self.node.left.postorder_traverse()
+        for i in l:
+            inlist.append(i)
+
+        l = self.node.right.postorder_traverse()
+        for i in l:
+            inlist.append(i)
+
+        inlist.append(self.node.value)
+        return inlist
+

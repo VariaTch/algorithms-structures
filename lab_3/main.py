@@ -2,8 +2,6 @@ from BinaryTree import BinNode, Tree
 from AVLTree import AVLnode, AVL
 
 
-# s = "(8(9(5))(1))"
-
 def AVLFromBin(binaryRoot, avlTree):
     if binaryRoot:
         avlTree.insert(binaryRoot.data)
@@ -81,13 +79,7 @@ if type(res) == str:
 print('______________________________________')
 AVLFromBin(t.root, a_tree)
 a_tree.display()
-rt = None
-a_tree.DFS_preOrder(rt)
-print('______________________________________')
-#a_tree.DFS_inOrder(rt)
-print('______________________________________')
-#a_tree.DFS_postOrder(rt)
 
-print('______________________________________')
-#a_tree.levelOrder(rt)
-print('______________________________________')
+print('In_order: ', a_tree.inorder_traverse())
+print('Pre_order: ', a_tree.preorder_traverse())
+print('Post_order: ', a_tree.postorder_traverse())

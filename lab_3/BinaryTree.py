@@ -50,7 +50,6 @@ class Tree:
 
         self.show_tree(node.right)
 
-
     def show_wide_tree(self, node):
         if node is None:
             return
