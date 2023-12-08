@@ -4,6 +4,12 @@ from AVLTree import AVLnode, AVL
 
 # s = "(8(9(5))(1))"
 
+def AVLFromBin(binaryRoot, avlTree):
+    if binaryRoot:
+        avlTree.insert(binaryRoot.data)
+        AVLFromBin(binaryRoot.right, avlTree)
+        AVLFromBin(binaryRoot.left, avlTree)
+
 
 def correct_parentheses(s):
     start = -1
@@ -24,7 +30,6 @@ def correct_parentheses(s):
 
     if count_left == count_right:
         return True
-
 
 
 def positive_numbers(s):
@@ -48,8 +53,6 @@ def read_file():
         # прерываем цикл, если строка пустая
         if not s:
             break
-        # выводим строку
-        print(s.strip())
         s = s.strip()
 
         if correct_parentheses(s):
@@ -73,18 +76,18 @@ if type(res) == str:
     for x in res:
         t.append(BinNode(x))
 
-    t.show_wide_tree(t.root)
+    t.show_tree(t.root)
 
 print('______________________________________')
+AVLFromBin(t.root, a_tree)
+a_tree.display()
 rt = None
-if type(res) == str:
-    for x in res:
-        a_tree.insert(int(x), rt)
-
-#rt = None
-#rt = Tree.insert(3, rt)
 a_tree.DFS_preOrder(rt)
 print('______________________________________')
-a_tree.DFS_inOrder(rt)
+#a_tree.DFS_inOrder(rt)
 print('______________________________________')
-a_tree.DFS_postOrder(rt)
+#a_tree.DFS_postOrder(rt)
+
+print('______________________________________')
+#a_tree.levelOrder(rt)
+print('______________________________________')

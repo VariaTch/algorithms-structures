@@ -2,30 +2,38 @@ from queue import Queue
 
 q = Queue
 
+output_debug = False
+
+
+def debug(msg):
+    if output_debug:
+        print(msg)
+
 
 class AVLnode:
     def __init__(self, num):
         self.value = num
         self.left = None
         self.right = None
-        self.height = 1
 
 
 class AVL:
+    def __init__(self, *args):
+        self.node = None
+        self.height = -1
+        self.balance = 0
+
+
+        if len(args) == 1:
+            for i in args[0]:
+                self.insert(i)
 
     # высота определенного узла
-    def height(self, AVLNode):
-        if AVLNode is None:
-            return 0
+    def height(self):
+        if self.node:
+            return self.node.height
         else:
-            return AVLNode.height
-
-    # вычисление коэффицента балансировки
-    def balance(self, AVLNode):
-        if AVLNode is None:
             return 0
-        else:
-            return self.height(AVLNode.left) - self.height(AVLNode.right)
 
     # поиск пустого узла
     def MinimumValueNode(self, AVLNode):
@@ -35,80 +43,134 @@ class AVL:
             return self.MinimumValueNode(AVLNode.left)
 
     # поворот вправо
-    def rotateR(self, AVLNode):
-        a = AVLNode.left
-        b = a.right
-        a.right = AVLNode
-        AVLNode.left = b
-        AVLNode.height = 1 + max(self.height(AVLNode.left), self.height(AVLNode.right))
-        a.height = 1 + max(self.height(a.left), self.height(a.right))
-        return a
+    def rotateR(self):
+        # Rotate left pivoting on self
+        debug('Rotating ' + str(self.node.value) + ' right')
+        A = self.node
+        B = self.node.left.node
+        T = B.right.node
 
-    # поворот влево
-    def rotateL(self, AVLNode):
-        a = AVLNode.right
-        b = a.left
-        a.left = AVLNode
-        AVLNode.right = b
-        AVLNode.height = 1 + max(self.height(AVLNode.left), self.height(AVLNode.right))
-        a.height = 1 + max(self.height(a.left), self.height(a.right))
-        return a
+        self.node = B
+        B.right.node = A
+        A.left.node = T
 
-    # вставка
-    def insert(self, val, root):
-        if root is None:
-            return AVLnode(val)
-        elif val <= root.value:
-            root.left = self.insert(val, root.left)
-        elif val > root.value:
-            root.right = self.insert(val, root.right)
-        root.height = 1 + max(self.height(root.left), self.height(root.right))
-        balance = self.balance(root)
-        if balance > 1 and root.left.value > val:
-            return self.rotateR(root)
-        if balance < -1 and val > root.right.value:
-            return self.rotateL(root)
-        if balance > 1 and val > root.left.value:
-            root.left = self.rotateL(root.left)
-            return self.rotateR(root)
-        if balance < -1 and val < root.right.value:
-            root.right = self.rotateR(root.right)
-            return self.rotateL(root)
-        return root
+        # поворот влево
+
+    def rotateL(self):
+        # Rotate left pivoting on self
+        debug('Rotating ' + str(self.node.value) + ' left')
+        A = self.node
+        B = self.node.right.node
+        T = B.left.node
+
+        self.node = B
+        B.left.node = A
+        A.right.node = T
+
+        # вставка
+
+    def insert(self, value):
+        tree = self.node
+
+        new_node = AVLnode(value)
+
+        if tree is None:
+            self.node = new_node
+            self.node.left = AVL()
+            self.node.right = AVL()
+            debug("Inserted value [" + str(value) + "]")
+
+        elif value < tree.value:
+            self.node.left.insert(value)
+
+        elif value > tree.value:
+            self.node.right.insert(value)
+
+        else:
+            debug("value [" + str(value) + "] already in tree.")
+
+        self.rebalance()
+
+    def rebalance(self):
+        self.update_heights(False)
+        self.update_balances(False)
+        while self.balance < -1 or self.balance > 1:
+            if self.balance > 1:
+                if self.node.left.balance < 0:
+                    self.node.left.lrotate()
+                    self.update_heights()
+                    self.update_balances()
+                self.rotateR()
+                self.update_heights()
+                self.update_balances()
+
+            if self.balance < -1:
+                if self.node.right.balance > 0:
+                    self.node.right.rrotate()
+                    self.update_heights()
+                    self.update_balances()
+                self.rotateL()
+                self.update_heights()
+                self.update_balances()
+
+    def update_heights(self, recurse=True):
+        if not self.node is None:
+            if recurse:
+                if self.node.left is not None:
+                    self.node.left.update_heights()
+                if self.node.right is not None:
+                    self.node.right.update_heights()
+
+            self.height = max(self.node.left.height,
+                              self.node.right.height) + 1
+        else:
+            self.height = -1
+
+    def update_balances(self, recurse=True):
+        if not self.node is None:
+            if recurse:
+                if self.node.left is not None:
+                    self.node.left.update_balances()
+                if self.node.right is not None:
+                    self.node.right.update_balances()
+
+            self.balance = self.node.left.height - self.node.right.height
+        else:
+            self.balance = 0
 
     # прямой (Preorder) обход дерева
-    def DFS_preOrder(self, root):
-        if root is None:
+    def DFS_preOrder(self, node):
+        if self.node is None:
             return
-        print(root.value)
-        self.DFS_preOrder(root.left)
-        self.DFS_preOrder(root.right)
+        print(self.node.value)
+        self.DFS_preOrder(node.left)
+        self.DFS_preOrder(node.right)
 
     # центрированный (Inorder) обход дерева
-    def DFS_inOrder(self, root):
-        if root is None:
+    def DFS_inOrder(self, node):
+        if self.node is None:
             return
 
-        self.DFS_inOrder(root.left)
-        print(root.value)
-        self.DFS_inOrder(root.right)
+        self.DFS_inOrder(node.left)
+        print(self.node.value)
+        self.DFS_inOrder(node.right)
 
     # обратный (postOrder) обход дерева
-    def DFS_postOrder(self, root):
-        if root is None:
+    def DFS_postOrder(self, node):
+        if self.node is None:
             return
 
-        self.DFS_postOrder(root.left)
-        self.DFS_postOrder(root.right)
-        print(root.value)
+        self.DFS_postOrder(node.left)
+        self.DFS_postOrder(node.right)
+        print(self.node.value)
 
     # BFS
-    def levelOrder(self, root):
-        if root is None:
+    def levelOrder(self, node):
+        if self.node is None:
             return
         else:
             customQueue = q
-            customQueue.push(root)
+            customQueue.push(self.node)
             while not (customQueue.isEmpty()):
                 root_1 = customQueue.pop()
                 print(root_1.value.data)
@@ -117,52 +179,59 @@ class AVL:
                 if root_1.value.right is not None:
                     customQueue.push(root_1.value.right)
 
-    def delete(self, val, Node):
-        if Node is None:
-            return Node
-        elif val < Node.value:
-            Node.left = self.delete(val, Node.left)
-        elif val > Node.value:
-            Node.right = self.delete(val, Node.right)
-        else:
-            if Node.left is None:
-                lt = Node.right
-                Node = None
-                return lt
-            elif Node.right is None:
-                lt = Node.left
-                Node = None
-                return lt
-            rgt = self.MinimumValueNode(Node.right)
-            Node.value = rgt.value
-            Node.right = self.delete(rgt.value, Node.right)
-        if Node is None:
-            return Node
-        Node.height = 1 + max(self.height(Node.left), self.height(Node.right))
-        balance = self.balance(Node)
-        if balance > 1 and self.balance(Node.left) >= 0:
-            return self.rotateR(Node)
-        if balance < -1 and self.balance(Node.right) <= 0:
-            return self.rotateL(Node)
-        if balance > 1 and self.balance(Node.left) < 0:
-            Node.left = self.rotateL(Node.left)
-            return self.rotateR(Node)
-        if balance < -1 and self.balance(Node.right) > 0:
-            Node.right = self.rotateR(Node.right)
-            return self.rotateL(Node)
-        return Node
+    def delete(self, value):
+        if self.node is not None:
+            if self.node.value == value:
+                debug("Deleting ... " + str(value))
+                if self.node.left.node is None and self.node.right.node is None:
+                    self.node = None  # leaves can be killed at will
+                # if only one subtree, take that
+                elif self.node.left.node is None:
+                    self.node = self.node.right.node
+                elif self.node.right.node is None:
+                    self.node = self.node.left.node
 
-    def show_wide_tree(self, node):
-        if node is None:
+                else:
+                    replacement = self.logical_successor(self.node)
+                    if replacement != None:  # sanity check
+                        debug("Found replacement for " + str(value) + " -> " + str(replacement.value))
+                        self.node.value = replacement.value
+
+                        self.node.right.delete(replacement.value)
+
+                self.rebalance()
+                return
+            elif value < self.node.value:
+                self.node.left.delete(value)
+            elif value > self.node.value:
+                self.node.right.delete(value)
+
+            self.rebalance()
+        else:
             return
-        v = [node]
-        while v:
-            vn = []
-            for x in v:
-                print(x.data, end=" ")
-                if x.left:
-                    vn += [x.left]
-                if x.right:
-                    vn += [x.right]
-            print()
-            v = vn
+
+    def is_leaf(self):
+        return self.height == 0
+
+        # Find the smallest valued node in RIGHT child
+
+    def logical_successor(self, node):
+        node = node.right.node
+        if node is not None:
+            while node.left is not None:
+                debug("LS: traversing: " + str(node.value))
+                if node.left.node is None:
+                    return node
+                else:
+                    node = node.left.node
+        return node
+
+    def display(self, level=0, pref=''):
+        self.update_heights()
+        self.update_balances()
+        if self.node is not None:
+            print('-' * level * 2, pref, self.node.value, "[" + str(self.height) + ":" + str(self.balance) + "]",
+                  'Leaf' if self.is_leaf() else ' ')
+            self.node.left.display(level + 1, '>')
+            if self.node.left is not None:
+                self.node.right.display(level + 1, '>')

@@ -45,10 +45,11 @@ class Tree:
     def show_tree(self, node):
         if node is None:
             return
-
-        self.show_tree(node.left)
         print(node.data)
+        self.show_tree(node.left)
+
         self.show_tree(node.right)
+
 
     def show_wide_tree(self, node):
         if node is None:
