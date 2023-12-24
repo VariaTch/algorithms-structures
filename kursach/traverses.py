@@ -28,34 +28,3 @@ class GraphTraversal:
                 visited.append(vertex)
                 queue.extend(set(self.graph[vertex]) - set(visited))
         return visited
-'''
-class GraphTraversal:
-    def __init__(self, adjacency_list):
-        self.adjacency_list = adjacency_list
-
-    def breadth_first_search(self, start_vertex):
-        visited = {vertex: False for vertex in self.adjacency_list}
-        queue = deque([start_vertex])
-        visited[start_vertex] = True
-
-        while queue:
-            current_vertex = queue.popleft()
-            print(current_vertex)
-
-            for neighbor in self.adjacency_list[current_vertex]:
-                if not visited[neighbor]:
-                    queue.append(neighbor)
-                    visited[neighbor] = True
-
-    def depth_first_search(self, start_vertex):
-        visited = {vertex: False for vertex in self.adjacency_list}
-
-        def dfs_recursive(vertex):
-            print(vertex)
-            visited[vertex] = True
-            for neighbor in self.adjacency_list[vertex]:
-                if not visited[neighbor]:
-                    dfs_recursive(neighbor)
-
-        dfs_recursive(start_vertex)
-'''
