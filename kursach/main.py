@@ -18,7 +18,6 @@ class Graph:
     def union(self, parent, rank, x, y):
         x_root = self.find_parent(parent, x)
         y_root = self.find_parent(parent, y)
-
         if rank[x_root] < rank[y_root]:
             parent[x_root] = y_root
         elif rank[x_root] > rank[y_root]:
@@ -29,38 +28,30 @@ class Graph:
 
     def kruskal(self):
         result = []
-        i, e = 0, 0
+        e = 0
+        for i in range(1, len(self.graph)):
+            key = self.graph[i]
+            j = i - 1
+            while j >= 0 and key[2] < self.graph[j][2]:
+                self.graph[j + 1] = self.graph[j]
+                j -= 1
+            self.graph[j + 1] = key
 
-        self.graph = sorted(self.graph, key=lambda item: item[2])
-        parent = []
-        rank = []
+        parent = [i for i in range(self.V)]
+        rank = [0] * self.V
 
-        for node in range(self.V):
-            parent.append(node)
-            rank.append(0)
-
-        while e < self.V - 1:
+        i = 0
+        while e < self.V - 1 and i < len(self.graph):
             u, v, w = self.graph[i]
             i += 1
             x = self.find_parent(parent, u)
             y = self.find_parent(parent, v)
-
             if x != y:
                 e += 1
                 result.append([u, v, w])
                 self.union(parent, rank, x, y)
 
         return result
-
-
-def insertion_sort(list):
-    for i in range(1, len(list)):
-        temp = list[i]
-        j = i - 1
-        while (j >= 0 and temp < list[j]):
-            list[j + 1] = list[j]
-            j = j - 1
-        list[j + 1] = temp
 
 
 def read_matrix(filename):
@@ -101,17 +92,6 @@ def main():
         for x in m:
             print(x[i], end=' ')
         print()
-
-    print("Неотсортированный список рёбер:")
-    for row in matrix:
-        print(row)
-
-    for i in range(len(matrix)):
-        insertion_sort(matrix[i])
-
-    print("Отсортированный список рёбер:")
-    for row in matrix:
-        print(row)
 
     g = Graph(num_vertices)
 
